@@ -1,5 +1,7 @@
 const CategoriesModel = require('../models/categoriesModel');
 
+const { v4: uuidv4 } = require('uuid');
+
 exports.getCategories = async (req, res) => {
     try {
         // Fetch categories
@@ -34,7 +36,8 @@ exports.getCategory = async (req, res) => {
 
 exports.createCategory = async (req, res) => {
     // Assuming categoryId and categoryName are provided in the body
-    const { categoryId, categoryName } = req.body;
+    const { categoryName } = req.body;
+    const categoryId = req.body.categoryId || uuidv4();
 
     try {
         // Call the createCategory function from the CategoriesModel

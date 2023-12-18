@@ -95,11 +95,17 @@ const CategoriesModel = {
         }
     },
 
-    modifyCategoryProductRelationship: async (client, categoryId, productId, newCategory) => {
+    modifyCategoryProductRelationship: async (client, categoryId, productId, newCategoryId) => {
         try {
-            const query = 'UPDATE category_product_relationship SET categoryId = ? WHERE categoryId = ? AND productId = ?';
-            await client.execute(query, [newCategory, categoryId, productId]);
-            console.log(`Category-Product relationship modified for Product ID ${productId} with new Category ID: ${newCategory}`);
+            // Delete the existing relationship
+            const deleteQuery = 'DELETE FROM category_product_relationship WHERE categoryId = ? AND productId = ?';
+            await client.execute(deleteQuery, [categoryId, productId]);
+
+            // Create a new relationship
+            const insertQuery = 'INSERT INTO category_product_relationship (categoryId, productId) VALUES (?, ?)';
+            await client.execute(insertQuery, [newCategoryId, productId]);
+
+            console.log(`Category-Product relationship modified for categoryId: ${categoryId}, productId: ${productId}`);
         } catch (error) {
             console.error('Error modifying Category-Product relationship:', error);
             throw error;

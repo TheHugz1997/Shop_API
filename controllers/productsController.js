@@ -36,7 +36,8 @@ exports.getProducts = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
     const { productName, productPhoto } = req.body;
-    const productId = req.body.productId || uuidv4(); // Use provided UUID or generate a new one
+    // Use provided UUID or generate a new one
+    const productId = req.body.productId || uuidv4();
 
     try {
         // Pass the client to the createProduct function
