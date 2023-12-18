@@ -8,7 +8,9 @@ const ProductsModel = {
         CREATE TABLE IF NOT EXISTS products (
           productId UUID PRIMARY KEY,
           productName TEXT,
-          productPhoto TEXT
+          productPhoto TEXT,
+          quantity INT,
+          price DECIMAL
         )
       `;
       await client.execute(createProductsTableQuery);
@@ -41,22 +43,26 @@ const ProductsModel = {
     }
   },
 
-  createProduct: async (client, productId, productName, productPhoto) => {
+  createProduct: async (client, productId, productName, productPhoto, quantity, price) => {
     try {
-      const query = 'INSERT INTO products (productId, productName, productPhoto) VALUES (?, ?, ?)';
-      await client.execute(query, [productId, productName, productPhoto]);
-      console.log(`Product ${productId} created with name: ${productName} and url: ${productPhoto}`);
+        // Convert quantity to integer and price to decimal
+        const parsedQuantity = parseInt(quantity, 10);
+        const parsedPrice = parseFloat(price);
+
+        const query = 'INSERT INTO products (productId, productName, productPhoto, quantity, price) VALUES (?, ?, ?, ?, ?)';
+        await client.execute(query, [productId, productName, productPhoto, parsedQuantity, parsedPrice], { prepare: true });
+        console.log(`Product ${productId} created with name: ${productName}, quantity: ${parsedQuantity}, and price: ${parsedPrice}`);
     } catch (error) {
-      console.error('Error creating product:', error);
-      throw error;
+        console.error('Error creating product:', error);
+        throw error;
     }
   },
 
-  modifyProduct: async (client, productId, newName, newPhoto) => {
+  modifyProduct: async (client, productId, newName, newPhoto, newQuantity, newPrice) => {
     try {
-        const query = 'UPDATE products SET productName = ?, productPhoto = ? WHERE productId = ?';
-        await client.execute(query, [newName, newPhoto, productId]);
-        console.log(`Product ${productId} modified with new name: ${newName} and new photo: ${newPhoto}`);
+        const query = 'UPDATE products SET productName = ?, productPhoto = ?, quantity = ?, price = ? WHERE productId = ?';
+        await client.execute(query, [newName, newPhoto, newQuantity, newPrice, productId], { prepare: true });
+        console.log(`Product ${productId} modified with new name: ${newName}, new photo: ${newPhoto}, new quantity: ${newQuantity}, new price: ${newPrice}`);
     } catch (error) {
         console.error('Error modifying product:', error);
         throw error;

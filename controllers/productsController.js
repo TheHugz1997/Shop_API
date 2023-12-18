@@ -35,30 +35,29 @@ exports.getProducts = async (req, res) => {
 };
 
 exports.createProduct = async (req, res) => {
-    const { productName, productPhoto } = req.body;
+    const { productName, productPhoto, quantity, price } = req.body;
     // Use provided UUID or generate a new one
     const productId = req.body.productId || uuidv4();
 
     try {
         // Pass the client to the createProduct function
-        await ProductsModel.createProduct(req.app.get('cassandraClient'), productId, productName, productPhoto);
-        res.status(201).json({ message: `Product ${productId} created with name: ${productName} and with the url: ${productPhoto}` });
+        await ProductsModel.createProduct(req.app.get('cassandraClient'), productId, productName, productPhoto, quantity, price);
+        res.status(201).json({ message: `Product ${productId} created with name: ${productName}, photo: ${productPhoto}, quantity: ${quantity}, and price: ${price}` });
     } catch (error) {
         console.error('Error creating product:', error);
         res.status(500).send('Internal Server Error');
     }
 };
 
-
 exports.modifyProduct = async (req, res) => {
-    const { productId, newName, newPhoto } = req.body;
+    const { productId, newName, newPhoto, newQuantity, newPrice } = req.body;
 
     try {
         // Pass the client to the modifyProduct function
-        await ProductsModel.modifyProduct(req.app.get('cassandraClient'), productId, newName, newPhoto);
+        await ProductsModel.modifyProduct(req.app.get('cassandraClient'), productId, newName, newPhoto, newQuantity, newPrice);
 
         // Respond with a success message
-        res.json({ message: `Product ${productId} modified with new name: ${newName} and new photo: ${newPhoto}` });
+        res.json({ message: `Product ${productId} modified with new name: ${newName}, new photo: ${newPhoto}, new quantity: ${newQuantity}, new price: ${newPrice}` });
     } catch (error) {
         // Handle errors by sending an error response
         console.error('Error modifying product:', error);
