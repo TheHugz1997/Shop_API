@@ -1,10 +1,7 @@
 const cassandra = require('cassandra-driver');
 
-// Assuming your Cassandra client is already initialized (e.g., in server.js)
-// const client = ...
-
 const CategoriesModel = {
-  createTables: async () => {
+  createTables: async (client) => {
     try {
       // Create categories table
       const createCategoriesTableQuery = `
