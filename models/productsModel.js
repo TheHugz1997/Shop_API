@@ -80,11 +80,24 @@ const ProductsModel = {
     }
   },
 
-  setProductPromotion: async (client, productId, isOnPromotion) => {
+  setProductPromotion: async (client, productId, isOnPromotion, newPrice) => {
     try {
-      const query = 'UPDATE products SET promotion = ? WHERE productId = ?';
-      await client.execute(query, [isOnPromotion, productId], { prepare: true });
-      console.log(`Product ${productId} promotion status updated to ${isOnPromotion}`);
+      let query;
+      if (isOnPromotion && typeof newPrice === 'number') {
+        // If setting promotion and providing a new price
+        query = 'UPDATE products SET promotion = ?, price = ? WHERE productId = ?';
+        await client.execute(query, [isOnPromotion, newPrice, productId], { prepare: true });
+      } else {
+        // If only setting or removing promotion without modifying price
+        query = 'UPDATE products SET promotion = ? WHERE productId = ?';
+        await client.execute(query, [isOnPromotion, productId], { prepare: true });
+      }
+
+      console.log(`Product ${productId} promotion status set to ${isOnPromotion}`);
+
+      if (isOnPromotion && typeof newPrice === 'number') {
+        console.log(`Product ${productId} price updated to ${newPrice}`);
+      }
     } catch (error) {
       console.error('Error setting product promotion status:', error);
       throw error;
@@ -93,14 +106,25 @@ const ProductsModel = {
 
   getPromotionalProducts: async (client) => {
     try {
-      const query = 'SELECT * FROM products WHERE promotion = true';
+      // Check if the materialized view exists, and create it if not
+      await client.execute(`
+        CREATE MATERIALIZED VIEW IF NOT EXISTS promotional_products_view AS
+        SELECT productId, productName, productPhoto, quantity, price, promotion
+        FROM products
+        WHERE promotion IS NOT NULL AND productId IS NOT NULL
+        PRIMARY KEY (promotion, productId);
+      `);
+
+      // Query the materialized view for promotional products
+      const query = 'SELECT * FROM promotional_products_view WHERE promotion = true';
       const result = await client.execute(query);
+
       return result.rows;
     } catch (error) {
       console.error('Error fetching promotional products:', error);
       throw error;
     }
-  }
+  },
 };
 
 

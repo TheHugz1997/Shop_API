@@ -81,11 +81,11 @@ exports.deleteProduct = async (req, res) => {
 };
 
 exports.setProductPromotion = async (req, res) => {
-    const { productId, isOnPromotion } = req.body;
-  
+    const { productId, isOnPromotion, newPrice } = req.body;
+
     try {
         // Pass the client to the setProductPromotion function
-        await ProductsModel.setProductPromotion(req.app.get('cassandraClient'), productId, isOnPromotion);
+        await ProductsModel.setProductPromotion(req.app.get('cassandraClient'), productId, isOnPromotion, newPrice);
 
         res.json({ message: `Product ${productId} promotion status set to ${isOnPromotion}` });
     } catch (error) {
@@ -102,4 +102,4 @@ exports.getPromotionalProducts = async (req, res) => {
       console.error('Error fetching promotional products:', error);
       res.status(500).send('Internal Server Error');
     }
-  };
+};
