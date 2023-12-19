@@ -4,6 +4,8 @@ const express = require('express');
 // Initialize the app
 const app = express();
 
+const cors = require('cors');
+
 app.use(express.json());
 
 require('dotenv').config();
@@ -14,6 +16,8 @@ const cassandra = require('cassandra-driver');
 // cookie parser
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
+
+app.use(cors());
 
 let router = require('./routes');
 app.use("/", router);

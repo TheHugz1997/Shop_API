@@ -21,56 +21,62 @@ const BasketModel = {
     }
   },
 
-  calculateTotalPrice: async (client, products) => {
-    let totalPrice = 0;
+    calculateTotalPrice: async (client, products) => {
+        let totalPrice = 0;
 
-    for (const productId in products) {
-      const quantity = products[productId];
+        for (const product of products) {
+            const { productId, quantity } = product;
 
-      // Fetch the price of the product from the products table
-      const getProductQuery = 'SELECT price FROM products WHERE productId = ?';
-      const productResult = await client.execute(getProductQuery, [productId]);
-      const productPrice = productResult.rows[0].price;
+            console.log(productId);
+            // Fetch the price of the product from the products table
+            const getProductQuery = 'SELECT price FROM products WHERE productId = ?';
+            const productResult = await client.execute(getProductQuery, [productId], { prepare: true });
+            const productPrice = productResult.rows[0].price;
 
-      // Update the total price
-      totalPrice += quantity * productPrice;
-    }
+            // Update the total price
+            totalPrice += quantity * productPrice;
+        }
 
-    return new cassandra.types.BigDecimal(totalPrice);
-  },
+        return new cassandra.types.BigDecimal(totalPrice);
+    },
 
-  saveOrder: async (client, userEmail, products) => {
-    try {
-      // Generate a new UUID as a string using uuidv4
-      const newOrderId = uuidv4();
 
-      // Calculate total price based on product quantities
-      const totalPrice = await BasketModel.calculateTotalPrice(client, products);
+    saveOrder: async (client, orderId, userEmail, products) => {
+        try {
+            // Calculate total price based on product quantities
+            const totalPrice = await BasketModel.calculateTotalPrice(client, products);
+    
+            // Extract an array of productIds and quantities from the products array
+            const productData = products.map(product => ({
+                productId: product.productId,
+                quantity: product.quantity
+            }));
 
-      // Insert order into the basket table
-      const query = 'INSERT INTO basket (orderId, user_email, products, totalPrice) VALUES (?, ?, ?, ?)';
-      await client.execute(query, [newOrderId, userEmail, products, totalPrice], { prepare: true });
+            // Insert order into the basket table using a prepared statement
+            console.log(orderId);
+            const query = 'INSERT INTO basket (orderId, user_email, products, totalPrice) VALUES (?, ?, ?, ?)';
+            await client.execute(query, [orderId, userEmail, productData, totalPrice], { prepare: true });
+    
+            // Update product quantities in the products table
+            await BasketModel.updateProductQuantities(client, productData);
+    
+            console.log(`Order ${orderId} saved for user ${userEmail} with total price: ${totalPrice.toString()}`);
+        } catch (error) {
+            console.error('Error saving order:', error);
+            throw error;
+        }
+    },
 
-      // Update product quantities in the products table (Assuming updateProductQuantities is defined)
-      await BasketModel.updateProductQuantities(client, products);
-
-      console.log(`Order ${newOrderId} saved for user ${userEmail} with total price: ${totalPrice.toString()}`);
-    } catch (error) {
-      console.error('Error saving order:', error);
-      throw error;
-    }
-  },
-
-  getOrders: async (client) => {
-    try {
-      const query = 'SELECT * FROM basket';
-      const result = await client.execute(query);
-      return result.rows;
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-      throw error;
-    }
-  },
+    getOrders: async (client) => {
+        try {
+            const query = 'SELECT * FROM basket';
+            const result = await client.execute(query);
+            return result.rows;
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            throw error;
+        }
+    },
 
   modifyOrder: async (client, orderId, newProducts, userEmail) => {
     try {
