@@ -14,15 +14,14 @@ exports.getOrders = async (req, res) => {
 
 exports.saveOrder = async (req, res) => {
     const { userEmail, products } = req.body;
-    const orderId = uuidv4();
 
     try {
-    // Pass the client to the saveOrder function
-    await BasketModel.saveOrder(req.app.get('cassandraClient'), orderId, userEmail, products);
-    res.status(201).json({ message: `Order ${orderId} saved for user ${userEmail}` });
+        // Pass the client to the saveOrder function
+        await BasketModel.saveOrder(req.app.get('cassandraClient'), userEmail, products);
+        res.status(201).json({ message: `Order ${orderId} saved for user ${userEmail}` });
     } catch (error) {
-    console.error('Error saving order:', error);
-    res.status(500).send('Internal Server Error');
+        console.error('Error saving order:', error);
+        res.status(500).send('Internal Server Error');
     }
 };
 

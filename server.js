@@ -20,6 +20,7 @@ app.use("/", router);
 
 const ProductsModel = require('./models/productsModel');
 const CategoriesModel = require('./models/categoriesModel');
+const BasketModel = require('./models/basketModel');
 
 const client = new cassandra.Client({
     contactPoints: ['127.0.0.1'],
@@ -39,6 +40,7 @@ client.connect()
         // Create tables (ensure products and categories tables are created)
         await ProductsModel.createTable(client);
         await CategoriesModel.createTables(client);
+        await BasketModel.createTable(client);
     })
     .then(() => {
         // Start the server after ensuring tables are created
