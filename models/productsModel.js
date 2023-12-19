@@ -3,14 +3,14 @@ const cassandra = require('cassandra-driver');
 const ProductsModel = {
   createTable: async (client) => {
     try {
-      // Create products table
       const createProductsTableQuery = `
         CREATE TABLE IF NOT EXISTS products (
           productId UUID PRIMARY KEY,
           productName TEXT,
           productPhoto TEXT,
           quantity INT,
-          price DECIMAL
+          price DECIMAL,
+          promotion BOOLEAN 
         )
       `;
       await client.execute(createProductsTableQuery);
@@ -78,7 +78,30 @@ const ProductsModel = {
         console.error('Error deleting product:', error);
         throw error;
     }
+  },
+
+  setProductPromotion: async (client, productId, isOnPromotion) => {
+    try {
+      const query = 'UPDATE products SET promotion = ? WHERE productId = ?';
+      await client.execute(query, [isOnPromotion, productId], { prepare: true });
+      console.log(`Product ${productId} promotion status updated to ${isOnPromotion}`);
+    } catch (error) {
+      console.error('Error setting product promotion status:', error);
+      throw error;
+    }
+  },
+
+  getPromotionalProducts: async (client) => {
+    try {
+      const query = 'SELECT * FROM products WHERE promotion = true';
+      const result = await client.execute(query);
+      return result.rows;
+    } catch (error) {
+      console.error('Error fetching promotional products:', error);
+      throw error;
+    }
   }
 };
+
 
 module.exports = ProductsModel;

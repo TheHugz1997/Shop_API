@@ -13,8 +13,7 @@ exports.getProducts = async (req, res) => {
     }
   };
 
-  exports.getProduct = async (req, res) => {
-    // Assuming productId is a parameter in the route
+exports.getProduct = async (req, res) => {
     const { productId } = req.params;
 
     try {
@@ -80,8 +79,27 @@ exports.deleteProduct = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
+
+exports.setProductPromotion = async (req, res) => {
+    const { productId, isOnPromotion } = req.body;
   
+    try {
+        // Pass the client to the setProductPromotion function
+        await ProductsModel.setProductPromotion(req.app.get('cassandraClient'), productId, isOnPromotion);
 
+        res.json({ message: `Product ${productId} promotion status set to ${isOnPromotion}` });
+    } catch (error) {
+        console.error('Error setting product promotion status:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
 
-
-
+exports.getPromotionalProducts = async (req, res) => {
+    try {
+      const promotionalProducts = await ProductsModel.getPromotionalProducts(req.app.get('cassandraClient'));
+      res.json(promotionalProducts);
+    } catch (error) {
+      console.error('Error fetching promotional products:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  };
