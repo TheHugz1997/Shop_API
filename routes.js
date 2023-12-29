@@ -17,7 +17,6 @@ router.delete('/product/delete/:productId', productsController.deleteProduct);
 router.get('/products/promotions', productsController.getPromotionalProducts);
 router.put('/product/set/promotion', productsController.setProductPromotion);
 
-
 // Categories routes
 router.get('/categories', categoriesController.getCategories);
 router.get('/category/:categoryId', categoriesController.getCategory);
