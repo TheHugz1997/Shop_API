@@ -33,8 +33,6 @@ router.delete('/category/product/relation/delete', categoriesController.deleteCa
 // Basket routes
 router.post('/basket/order/save', basketController.saveOrder);
 router.get('/basket/orders', basketController.getOrders);
-router.put('/basket/order/modify', basketController.modifyOrder);
-router.delete('/basket/order/delete/:orderId', basketController.deleteOrder);
 
 
 module.exports = router;

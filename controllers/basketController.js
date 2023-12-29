@@ -29,31 +29,3 @@ exports.saveOrder = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
-
-
-exports.modifyOrder = async (req, res) => {
-    const { orderId, newProducts } = req.body;
-  
-    try {
-      await BasketModel.modifyOrder(req.app.get('cassandraClient'), orderId, newProducts, req.user.email);
-  
-      res.json({ message: `Order ${orderId} modified` });
-    } catch (error) {
-      console.error('Error modifying order:', error);
-      res.status(500).send('Internal Server Error');
-    }
-};
-
-exports.deleteOrder = async (req, res) => {
-    const { orderId } = req.params;
-
-    try {
-    // Call the deleteOrder function from the BasketModel with the client
-    await BasketModel.deleteOrder(req.app.get('cassandraClient'), orderId);
-    res.json({ message: `Order ${orderId} deleted` });
-    } catch (error) {
-    console.error('Error deleting order:', error);
-    res.status(500).send('Internal Server Error');
-    }
-};
-

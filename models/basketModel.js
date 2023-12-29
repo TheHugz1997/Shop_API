@@ -97,39 +97,7 @@ const BasketModel = {
           console.error('Error fetching orders:', error);
           throw error;
       }
-  },
-
-  modifyOrder: async (client, orderId, newProducts, userEmail) => {
-    try {
-      // Delete the existing order
-      await BasketModel.deleteOrder(client, orderId);
-
-      // Create a new order with the updated products
-      const newOrderId = cassandra.types.Uuid.random();
-      await BasketModel.saveOrder(client, newOrderId, userEmail, newProducts);
-
-      console.log(`Order ${orderId} modified`);
-    } catch (error) {
-      console.error('Error modifying order:', error);
-      throw error;
-    }
-  },
-
-  deleteOrder: async (client, orderId) => {
-    try {
-      const deleteOrderQuery = 'DELETE FROM basket WHERE orderId = ?';
-      await client.execute(deleteOrderQuery, [orderId]);
-      console.log(`Order ${orderId} deleted`);
-    } catch (error) {
-      console.error('Error deleting order:', error);
-      throw error;
-    }
-  },
-
-  updateProductQuantities: async (client, products) => {
-    // Add your implementation to update product quantities in the products table
-    // You need to implement the logic based on your specific database schema
   }
-};
+}
 
 module.exports = BasketModel;
