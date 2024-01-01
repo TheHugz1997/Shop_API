@@ -10,6 +10,9 @@ COPY package*.json ./
 # Install app dependencies
 RUN npm install
 
+# Install Cassandra driver
+RUN npm install cassandra-driver
+
 # Copy the rest of the application code to the container
 COPY . .
 
