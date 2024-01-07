@@ -10,6 +10,9 @@ COPY package*.json ./
 # Install app dependencies
 RUN npm install
 
+# Install dotenv module
+RUN npm install dotenv cookie-parser
+
 # Install Cassandra driver
 RUN npm install cassandra-driver
 

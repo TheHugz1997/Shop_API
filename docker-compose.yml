@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  nodejs-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: shop_api
+    container_name: nodejs-app
+    ports:
+      - "3200:3200"
+    depends_on:
+      - cassandra
+    environment:
+      - NODE_ENV=production
+    # Remove the network_mode: host line
+    networks:
+      - app-network
+
+  cassandra:
+    image: cassandra:latest
+    container_name: cassandra
+    ports:
+      - "9042:9042"
+    networks:
+      - app-network
+    environment:
+      - CASSANDRA_SEEDS=cassandra
+      - CASSANDRA_CLUSTER_NAME=ShopCluster
+      - CASSANDRA_KEYSPACE=shop_ecamazon2
+      - CASSANDRA_DC=datacenter1
+
+networks:
+  app-network:
+    driver: bridge

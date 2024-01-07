@@ -27,11 +27,12 @@ const CategoriesModel = require('./models/categoriesModel');
 const BasketModel = require('./models/basketModel');
 
 const client = new cassandra.Client({
-    contactPoints: ['127.0.0.1'],
+    contactPoints: ['cassandra'],
     localDataCenter: 'datacenter1', 
     keyspace: 'shop_ecamazon2',
     protocolOptions: { port: 9042 }
 });
+
 
 // Set the Cassandra client in the app
 app.set('cassandraClient', client);
