@@ -26,4 +26,5 @@ Before running the application, ensure you have the following installed:
 
 2. Build and run the container:
 
+    ```bash
     docker-compose up --build
