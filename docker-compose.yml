@@ -13,9 +13,9 @@ services:
       - cassandra
     environment:
       - NODE_ENV=production
-    # Remove the network_mode: host line
     networks:
-      - app-network
+      app-network:
+        ipv4_address: 192.168.93.21
 
   cassandra:
     image: cassandra:latest
@@ -23,7 +23,10 @@ services:
     ports:
       - "9042:9042"
     networks:
-      - app-network
+      app-network:
+        ipv4_address: 192.168.93.20
+    volumes:
+      - ./my_cassandra_storage:/var/lib/cassandra
     environment:
       - CASSANDRA_SEEDS=cassandra
       - CASSANDRA_CLUSTER_NAME=ShopCluster
@@ -32,4 +35,8 @@ services:
 
 networks:
   app-network:
-    driver: bridge
+    ipam: 
+      driver: default
+      config:
+        - subnet: "192.168.93.0/24"
+

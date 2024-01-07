@@ -27,12 +27,12 @@ const CategoriesModel = require('./models/categoriesModel');
 const BasketModel = require('./models/basketModel');
 
 const client = new cassandra.Client({
-    contactPoints: ['cassandra'],
+    // Use the correct IP address of your Cassandra container
+    contactPoints: ['cassandra'], 
     localDataCenter: 'datacenter1', 
     keyspace: 'shop_ecamazon2',
     protocolOptions: { port: 9042 }
 });
-
 
 // Set the Cassandra client in the app
 app.set('cassandraClient', client);
@@ -51,12 +51,12 @@ client.connect()
         // Start the server after ensuring tables are created
         const port = 3200;
         app.listen(port, () => {
-        console.log(`Server is running on port ${port}`);
+            console.log(`Server is running on port ${port}`);
         });
     })
     .catch((err) => {
         console.error('Error connecting to Cassandra:', err);
-});
+    });
 
 /*
     *********************************************
